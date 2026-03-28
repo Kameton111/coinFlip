@@ -118,12 +118,12 @@ async function play(choice) {
 async function getGamePlayed() {
     try {
         let currentBlock = await provider.getBlockNumber();
-        let fromBlock = Math.max(0, currentBlock - 100);
+        let fromBlock = Math.max(0, currentBlock - 10);
 
         let queryResult = await contract.queryFilter("GamePlayed", fromBlock, currentBlock);
 
         if (queryResult.length === 0) {
-            document.getElementById("result").innerText = "No events found yet";
+            document.getElementById("result").innerText = "Result not found yet";
             return;
         }
 
@@ -135,6 +135,13 @@ async function getGamePlayed() {
         let isWinner = lastEvent.args.isWinner;
         let isDraw = lastEvent.args.isDraw;
 
+        function choiceToText(choice) {
+            if (choice === 0) return "ROCK";
+            if (choice === 1) return "SCISSORS";
+            if (choice === 2) return "PAPER";
+            return "UNKNOWN";
+        }
+
         let finalResult = "LOSE";
         if (isDraw) {
             finalResult = "DRAW";
@@ -142,13 +149,11 @@ async function getGamePlayed() {
             finalResult = "WIN";
         }
 
-        let resultText =
-`Player: ${player}
+        let resultText = `Player: ${player}
 Your choice: ${choiceToText(playerChoice)}
 Contract choice: ${choiceToText(contractChoice)}
 Result: ${finalResult}`;
 
-        console.log(resultText);
         document.getElementById("result").innerText = resultText;
     } catch (error) {
         console.error(error);
